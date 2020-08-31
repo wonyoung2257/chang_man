@@ -11,8 +11,8 @@ export default class Signup extends Component {
       pass2: "",
       email: "",
       nickname: "",
-      checked_id: false,
-      checked_nick: false, // ID 중복검사
+      checked_id: false, // ID 중복검사
+      checked_nick: false,
       checked_email: false, // 메일 인증 확인
       authNum: "", //보낸 인증번호
       authCheckNum: "", // 사용자가 적은 인증번호
@@ -100,7 +100,7 @@ export default class Signup extends Component {
           if (json) {
             alert("사용가능한 아이디 입니다.");
             this.setState({
-              check_id: true,
+              checked_id: true,
             });
           } else {
             alert("이미 사용중인 아이디 입니다.");
@@ -174,6 +174,7 @@ export default class Signup extends Component {
           console.log(json);
           if (json) {
             alert("회원가입 성공");
+            window.location.href = "/";
           } else {
             alert("회원가입 실패");
           }

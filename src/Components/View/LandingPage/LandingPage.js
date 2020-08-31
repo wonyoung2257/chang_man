@@ -56,12 +56,20 @@ export default class LandingPage extends Component {
     }
   };
   componentDidMount() {
-    console.log(JSON.parse(localStorage.getItem("user")));
-    const user = JSON.parse(localStorage.getItem("user"));
-    user.user_nickname = "sex";
-    localStorage.setItem("user", JSON.stringify(user));
-    console.log(JSON.parse(localStorage.getItem("user")));
+    if (localStorage.getItem("user") === null) {
+      window.location.href = "/";
+      alert("로그인해라");
+    }
+    // console.log(JSON.parse(localStorage.getItem("user")));
+    // const user = JSON.parse(localStorage.getItem("user"));
+    // user.user_nickname = "sex";
+    // localStorage.setItem("user", JSON.stringify(user));
+    // console.log(JSON.parse(localStorage.getItem("user")));
   }
+  logout = () => {
+    localStorage.removeItem("user"); //로컬스토리지 지우기
+    window.location.href = "/";
+  };
 
   render() {
     return (
@@ -113,10 +121,8 @@ export default class LandingPage extends Component {
             </div>
           )}
         </div>
-
-        {/*Start.js*/}
         <div className="Title_landing">
-          <button>로그아웃</button>
+          <button onClick={this.logout}>로그아웃</button>
           <Start count={this.state.count} />
         </div>
       </div>

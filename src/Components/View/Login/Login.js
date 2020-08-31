@@ -41,8 +41,12 @@ export default class Login extends Component {
           //자바스크립트 라우트
           window.localStorage.setItem("user", JSON.stringify(json));
           console.log(JSON.parse(localStorage.getItem("user")).user_nickname);
+          window.location.href = "/Main";
         }
       });
+  };
+  singupBtn = () => {
+    window.location.href = "/Signup";
   };
 
   render() {
@@ -96,6 +100,12 @@ export default class Login extends Component {
             <button className="Btn_login" type="submit">
               로그인
             </button>
+            <input
+              className="Btn_login"
+              value="회원가입"
+              type="button"
+              onClick={this.singupBtn}
+            />
           </div>
         </form>
       </div>
