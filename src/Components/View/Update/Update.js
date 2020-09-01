@@ -9,6 +9,7 @@ export default class Update extends Component {
     this.state = {
       _id: user_info.user_id,
       pass: "",
+      pass2: "",
       email: "",
       nickname: user_info.user_nickname,
       update_nickname: "",
@@ -75,6 +76,25 @@ export default class Update extends Component {
         });
     }
   };
+  updatePassword = () => {
+    if (this.state.pass === "") {
+      alert("변경할 비밀번호를 입력해주세요");
+    } else if (this.state.pass === this.state.pass2) {
+      const password = {
+        _id: this.state._id,
+        pass: this.state.pass,
+      };
+      fetch("http://localhost:3001/Update_password", {
+        method: "post",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(password),
+      }).then(alert("비밀번호가 변경되었습니다."));
+    } else {
+      alert("비밀번호가 일치하지 않습니다.");
+    }
+  };
 
   render() {
     return (
@@ -92,11 +112,29 @@ export default class Update extends Component {
           </div>
           <div className="Text_sign">
             <label for="pass">비밀번호 </label>
-            <input className="Input_sign" />
+            <input
+              type="password"
+              name="pass"
+              value={this.state.pass}
+              onChange={this.handleChange}
+              className="Input_sign"
+            />
           </div>
           <div className="Text_sign">
             <label for="pass2">비밀번호 확인 </label>
-            <input className="Input_sign" />
+            <input
+              type="password"
+              name="pass2"
+              value={this.state.pass2}
+              onChange={this.handleChange}
+              className="Input_sign"
+            />
+            <input
+              type="button"
+              value="변경"
+              onClick={this.updatePassword}
+              className="Double_sign"
+            />
           </div>
           <div className="Text_sign">
             <label for="nickname">닉네임 </label>

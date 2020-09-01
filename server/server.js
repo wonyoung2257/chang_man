@@ -161,6 +161,25 @@ app.post("/Update_nick", (req, res) => {
   );
 });
 
+app.post("/Update_password", (req, res) => {
+  const pass = req.body.pass;
+  const user_id = req.body._id;
+  console.log(pass);
+  console.log(user_id);
+  connection.query(
+    "UPDATE user_info SET user_password =(?) WHERE user_id =(?)",
+    [pass, user_id],
+    function (err, rows, fields) {
+      if (err) {
+        console.log(err);
+        console.log("변경실패");
+      } else {
+        console.log("변경성공");
+      }
+    }
+  );
+});
+
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
