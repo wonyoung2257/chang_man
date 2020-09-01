@@ -28,9 +28,10 @@ app.post("/Signup", (req, res) => {
   const pass = req.body.pass;
   const pass2 = req.body.pass2;
   const nickname = req.body.nick;
+  const gender = req.body.gender;
   connection.query(
-    "insert into user_info (user_id,user_password, user_nickname, user_email) values (?,?,?,?)",
-    [_id, pass, nickname, mail],
+    "insert into user_info (user_id,user_password, user_nickname, user_email, user_gender) values (?,?,?,?,?)",
+    [_id, pass, nickname, mail, gender],
     function (err, rows, fields) {
       if (err) {
         res.send(false);
@@ -120,7 +121,7 @@ app.post("/Sendmail", (req, res) => {
   }
 
   let emailParam = {
-    toEmail: email + "@gmail.com",
+    toEmail: email + "@gmail.com", //gmail.com -> changwon.ac.kr로 수정하기
     subject: "회원가입 인증 메일입니다.",
     text: "인증번호는 " + authNum + "입니다.",
   };

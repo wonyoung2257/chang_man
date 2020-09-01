@@ -11,6 +11,7 @@ export default class Signup extends Component {
       pass2: "",
       email: "",
       nickname: "",
+      gender: "",
       checked_id: false, // ID 중복검사
       checked_nick: false,
       checked_email: false, // 메일 인증 확인
@@ -24,6 +25,7 @@ export default class Signup extends Component {
     this.setState({
       [e.target.name]: e.target.value,
     });
+    console.log(e.target.value);
   };
 
   sendEmail = () => {
@@ -161,6 +163,7 @@ export default class Signup extends Component {
         pass2: this.state.pass2,
         email: this.state.email,
         nick: this.state.nickname,
+        gender: this.state.gender,
       };
       fetch("http://localhost:3001/Signup", {
         method: "post",
@@ -250,6 +253,23 @@ export default class Signup extends Component {
               onClick={this.checkNick}
               className="Double_sign"
             />
+          </div>
+          <div className="Text_sign">
+            <label for="nickname">성별 </label>
+            <input
+              type="radio"
+              name="gender"
+              value="M"
+              onChange={this.handleChange}
+            />{" "}
+            남
+            <input
+              type="radio"
+              name="gender"
+              value="F"
+              onChange={this.handleChange}
+            />{" "}
+            여
           </div>
 
           <div className="Text_sign">
