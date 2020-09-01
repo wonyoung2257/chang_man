@@ -48,7 +48,6 @@ app.post("/CheckNick", (req, res) => {
     "SELECT user_nickname FROM user_info WHERE user_nickname =(?)",
     [checkingNick],
     function (err, rows, fields) {
-      console.log(rows[0]);
       if (rows[0] === undefined) {
         res.send(true); //중복 없음 사용가능
       } else {
@@ -74,7 +73,7 @@ app.post("/CheckId", (req, res) => {
     }
   );
 });
-
+//로그인 하는 부분
 app.post("/login", (req, res) => {
   const name = req.body.name;
   const pass = req.body.pass;
@@ -88,17 +87,14 @@ app.post("/login", (req, res) => {
       console.log(rows[0]);
       if (rows[0] === undefined) {
         res.send(box);
-        console.log("1");
       } else {
         connection.query(
           "SELECT user_id, user_password ,user_email,user_nickname FROM user_info WHERE  user_id = (?) AND user_password =(?)",
           [name, pass],
           function (err, rows, fields) {
             if (rows[0] === undefined) {
-              console.log("2");
               res.send(box);
             } else {
-              console.log("3");
               box.user_id = rows[0].user_id;
               box.user_email = rows[0].user_email;
               box.user_nickname = rows[0].user_nickname;
@@ -136,6 +132,30 @@ app.post("/Sendmail", (req, res) => {
       } else {
         //중복된 메일이 있음
         res.send(true);
+      }
+    }
+  );
+});
+
+//닉네임 업데이트하기
+app.post("/Update_nick", (req, res) => {
+  const nick = req.body.nick;
+  const preNick = req.body.preNick;
+  connection.query(
+    "SELECT user_nickname FROM user_info WHERE user_nickname = (?)",
+    [nick],
+    function (err, rows, fields) {
+      //중복된 닉네임이 없음 닉네임 변경 진행
+      if (rows[0] === undefined && !err) {
+        connection.query(
+          "UPDATE user_info SET user_nickname =(?) WHERE user_nickname =(?)",
+          [nick, preNick]
+        );
+        console.log("true");
+        res.send(true);
+      } else {
+        console.log("중복된 닉네임");
+        res.send(false);
       }
     }
   );

@@ -39,8 +39,8 @@ export default class Login extends Component {
         } else {
           alert("성공");
           //자바스크립트 라우트
+          //로그인 성공하면 localStorage에 저장하기
           window.localStorage.setItem("user", JSON.stringify(json));
-          console.log(JSON.parse(localStorage.getItem("user")).user_nickname);
           window.location.href = "/Main";
         }
       });

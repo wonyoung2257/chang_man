@@ -80,7 +80,7 @@ export default class LandingPage extends Component {
             <MenuIcon style={{ fontSize: 50, color: "white", marginTop: 5 }} />
           </Link>
 
-          <Link to="Login">
+          <Link to="Update">
             <ChatBubbleOutlineIcon
               style={{ fontSize: 50, color: "white", marginTop: 10 }}
             />

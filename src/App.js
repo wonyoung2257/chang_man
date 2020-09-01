@@ -5,6 +5,7 @@ import Signup from "./Components/View/Signup/Signup";
 import Login from "./Components/View/Login/Login";
 import "./App.css";
 import After from "./Components/View/After/After";
+import Update from "./Components/View/Update/Update";
 
 export default class App extends Component {
   render() {
@@ -23,6 +24,9 @@ export default class App extends Component {
             </Route>
             <Route path="/After">
               <After />
+            </Route>
+            <Route path="/Update">
+              <Update />
             </Route>
           </Switch>
         </div>
