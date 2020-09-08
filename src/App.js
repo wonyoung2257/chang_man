@@ -6,10 +6,20 @@ import Login from "./Components/View/Login/Login";
 import "./App.css";
 import After from "./Components/View/After/After";
 import Update from "./Components/View/Update/Update";
+import SocketIo from "./SocketIo";
+import SocketIo2 from "./SocketIo2";
 
 export default class App extends Component {
   render() {
     return (
+      // <Router>
+      //   <Route exact path="/">
+      //     <SocketIo />
+      //   </Route>
+      //   <Route path="/2">
+      //     <SocketIo2 />
+      //   </Route>
+      // </Router>
       <Router>
         <div>
           <Switch>

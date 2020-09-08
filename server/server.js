@@ -4,14 +4,18 @@ const port = 3001;
 const cors = require("cors");
 const bodyparser = require("body-parser");
 const mysql = require("mysql");
+var http = require("http").createServer(app);
+const io = require("socket.io")(http);
+
 // nodemailer 모듈 요청
 const nodemailer = require("nodemailer");
+const { light } = require("@material-ui/core/styles/createPalette");
 //mysql연결
 var connection = mysql.createConnection({
   host: "localhost",
   user: "root",
   password: "root",
-  database: "chang_man",
+  database: "wagle",
 });
 
 connection.connect();
@@ -19,6 +23,118 @@ connection.connect();
 app.use(bodyparser.urlencoded({ extended: false }));
 app.use(cors());
 app.use(bodyparser.json());
+
+io.on("connection", function (socket) {
+  // 소켓을 연결하는 부분
+  //socket이랑 연결된 부분
+
+  console.log("연결됨");
+
+  socket.on("room", (id) => {
+    socket.join(id, () => {
+      console.log(id + "접속함");
+      // console.log(socket);
+    });
+  });
+  //sql문에 매칭 추가
+  socket.on("start", (_id, nick, sex) => {
+    console.log("start : " + _id + " " + nick + " " + sex); //
+    connection.query(
+      "INSERT INTO matching_table (matching_userid, matching_nickname, matching_sex) values(?,?,?)",
+      [_id, nick, sex],
+      // "UPDATE user_info SET user_matching =? WHERE user_id =?",
+      // "SELECT * FROM user_info WHERE user_id =(?)",
+      function (err, rows, fields) {
+        if (err) {
+          console.log(err);
+        } else {
+          socket.emit("apply");
+          console.log("매칭을 시작합니다");
+        }
+        //매칭 등록 emit 하는 부분
+      }
+    );
+  });
+
+  socket.on("matching", (_id, sex) => {
+    console.log("서버:매칭 시작" + _id + sex);
+    connection.query(
+      //매칭 전 나의 매칭 테이블에 신청한 사람이 있는지 확인
+      "SELECT * FROM matching_table WHERE matching_userid =(?)",
+      [_id],
+      function (err, rows, fields) {
+        if (rows[0].matching_touserid === null) {
+          //나한테 신청한 사람이 없음
+          //매칭 테이블에 등록한 사람이 있는지 확인
+          connection.query(
+            "SELECT * FROM matching_table WHERE matching_sex =(?)",
+            [sex === "M" ? "F" : "M"],
+            // ["F"],
+            function (err, rows, fields) {
+              console.log(rows[0]);
+              if (rows[0] === undefined) {
+                //신청한 사람이 없으면 다시 등록으로 가게한다. matching으로 확인한다.
+                console.log("다시 신청");
+                socket.emit("apply");
+              } else {
+                console.log("매칭테이블 등록");
+                //신청한 사람이 있으면 테이블에 입력하고 다시 매칭
+                connection.query(
+                  "UPDATE matching_table SET matching_touserid = (?) WHERE matching_userid =(?)",
+                  [_id, rows[0].matching_userid] //다른 사람 매칭 테이블에 내 아이디를 입력한다.
+                ),
+                  function (err, rows, fields) {
+                    if (err) {
+                      console.log("상대 매칭테이블에 입력중 err발생");
+                    } else {
+                      console.log("상대방 테이블에 입력함: " + _id);
+                      socket.emit("mathching_success");
+                    }
+                  };
+              }
+            }
+          );
+        } else {
+          console.log("나한테 신청이 있음");
+          socket.emit("mathching_success");
+        }
+
+        // if (rows[0] === undefined) {
+        //   console.log(rows);
+        //   console.log("매칭할 사람 없음");
+        //   //다시 클라이언트로 보냄
+        //   socket.emit("apply");
+        // } else {
+        //   console.log("서버: 매칭 성공");
+        //   console.log(rows);
+        //   //방 생성, 신청자 matching false로 변경
+        //   connection.query(
+        //     "UPDATE user_info SET user_matching =? WHERE user_id =?",
+        //     [false, _id],
+        //     function (err, rows, fields) {
+        //       if (err) {
+        //         console.log(err);
+        //       } else {
+        //         socket.emit("mathched");
+        //       }
+        //     }
+        //   ); // 매치 성공하여 매칭 당한 사람의 id 전달 방 생성
+        // }
+      }
+    );
+  });
+  socket.on("room", (room_id) => {
+    socket.join(room_id, () => {
+      console.log(room_id + " 접속했음");
+    });
+  });
+
+  socket.on("send message", (message) => {
+    // socket은 개인의 고유값
+    console.log(message);
+    io.to(message.id).emit("show message", message.message); //io 전체
+  });
+});
 
 //3001/Signup 포트로 보내기
 app.post("/Signup", (req, res) => {
@@ -28,10 +144,10 @@ app.post("/Signup", (req, res) => {
   const pass = req.body.pass;
   const pass2 = req.body.pass2;
   const nickname = req.body.nick;
-  const gender = req.body.gender;
+  const sex = req.body.sex;
   connection.query(
-    "insert into user_info (user_id,user_password, user_nickname, user_email, user_gender) values (?,?,?,?,?)",
-    [_id, pass, nickname, mail, gender],
+    "insert into user_info (user_id,user_password, user_nickname, user_email, user_sex) values (?,?,?,?,?)",
+    [_id, pass, nickname, mail, sex],
     function (err, rows, fields) {
       if (err) {
         res.send(false);
@@ -89,7 +205,7 @@ app.post("/login", (req, res) => {
         res.send(box);
       } else {
         connection.query(
-          "SELECT user_id, user_password ,user_email,user_nickname FROM user_info WHERE  user_id = (?) AND user_password =(?)",
+          "SELECT user_id, user_password ,user_email,user_nickname, user_sex FROM user_info WHERE  user_id = (?) AND user_password =(?)",
           [name, pass],
           function (err, rows, fields) {
             if (rows[0] === undefined) {
@@ -98,6 +214,7 @@ app.post("/login", (req, res) => {
               box.user_id = rows[0].user_id;
               box.user_email = rows[0].user_email;
               box.user_nickname = rows[0].user_nickname;
+              box.user_sex = rows[0].user_sex;
               box.boolean = true;
               res.send(box);
             }
@@ -180,7 +297,7 @@ app.post("/Update_password", (req, res) => {
   );
 });
 
-app.listen(port, () => {
+http.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
 

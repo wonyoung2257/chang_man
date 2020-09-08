@@ -11,7 +11,7 @@ export default class Signup extends Component {
       pass2: "",
       email: "",
       nickname: "",
-      gender: "",
+      sex: "",
       checked_id: false, // ID 중복검사
       checked_nick: false,
       checked_email: false, // 메일 인증 확인
@@ -163,7 +163,7 @@ export default class Signup extends Component {
         pass2: this.state.pass2,
         email: this.state.email,
         nick: this.state.nickname,
-        gender: this.state.gender,
+        sex: this.state.sex,
       };
       fetch("http://localhost:3001/Signup", {
         method: "post",
@@ -258,14 +258,14 @@ export default class Signup extends Component {
             <label for="nickname">성별 </label>
             <input
               type="radio"
-              name="gender"
+              name="sex"
               value="M"
               onChange={this.handleChange}
             />{" "}
             남
             <input
               type="radio"
-              name="gender"
+              name="sex"
               value="F"
               onChange={this.handleChange}
             />{" "}
